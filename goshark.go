@@ -71,7 +71,7 @@ func (d *Decoder) NextPacket() (field *Field, err error) {
 	for {
 		line, _, err := d.BufioReader.ReadLine()
 		if err == io.EOF {
-			break
+			return field, err
 		} else if err != nil {
 			return field, err
 		}
@@ -85,7 +85,6 @@ func (d *Decoder) NextPacket() (field *Field, err error) {
 			out = append(out, byte('\n'))
 
 			if strings.Compare(string(line), "</packet>") == 0 {
-				//fmt.Println(string(line))
 				break
 			}
 		}
