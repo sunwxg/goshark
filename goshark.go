@@ -4,6 +4,7 @@ package goshark
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/jteeuwen/go-pkg-xmlx"
 )
+
+var ErrNoPacket = errors.New("Don't find Packet in data")
 
 type Field map[string]interface{}
 
@@ -67,22 +70,29 @@ func (d *Decoder) DecodeEnd() error {
 
 func (d *Decoder) NextPacket() (field Field, err error) {
 	var out []byte
+	var startRecord bool = false
 
 	for {
 		line, _, err := d.BufioReader.ReadLine()
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			//log.Priptln("read line fail:", err)
 			return field, err
 		}
 
-		out = append(out, line...)
-		out = append(out, byte('\n'))
-		if strings.Compare(string(line), "</packet>") == 0 {
-			break
+		if strings.Compare(string(line), "<packet>") == 0 {
+			startRecord = true
 		}
 
+		if startRecord {
+			out = append(out, line...)
+			out = append(out, byte('\n'))
+
+			if strings.Compare(string(line), "</packet>") == 0 {
+				//fmt.Println(string(line))
+				break
+			}
+		}
 	}
 
 	if err := d.Packet.LoadString(string(out), nil); err != nil {
@@ -90,6 +100,11 @@ func (d *Decoder) NextPacket() (field Field, err error) {
 	}
 
 	node := d.Packet.SelectNode("", "packet")
+	if node == nil {
+		err := io.EOF
+		return field, err
+	}
+
 	field = createField(node)
 
 	return
