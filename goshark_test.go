@@ -2,10 +2,9 @@
 package goshark
 
 import (
+	"bytes"
 	"strings"
 	"testing"
-
-	"github.com/jteeuwen/go-pkg-xmlx"
 )
 
 var data string = `<packet>
@@ -24,14 +23,6 @@ var data string = `<packet>
 </packet>
 `
 
-func setup() (d *xmlx.Document) {
-	d = xmlx.New()
-	if err := d.LoadString(data, nil); err != nil {
-		return
-	}
-	return
-}
-
 func TestNextPacket(t *testing.T) {
 
 	file := "2.pcap"
@@ -46,21 +37,26 @@ func TestNextPacket(t *testing.T) {
 		t.Fatalf("get packet fail")
 	}
 
-	expected := 11
-	if len(f) != expected {
-		t.Fatalf("expected (%d). get (%d)", expected, len(f))
+	expected := 1
+	get := len(f.Childs[0].Childs[1].Field)
+	if get != expected {
+		t.Fatalf("expected (%d). get (%d)", expected, get)
 	}
 }
 
 func TestIskey(t *testing.T) {
-	d := setup()
-	node := d.SelectNode("", "packet")
-	field := createField(node)
+	d := CreateDecoder()
+	r := bytes.NewReader([]byte(data))
+
+	f, err := d.LoadPacket(r)
+	if err != nil {
+		t.Fatalf("load packet fail")
+	}
 
 	expected := "50"
 
 	key := "f50"
-	get, ok := field.Iskey(key)
+	get, ok := f.Iskey(key)
 	if !ok {
 		t.Fatalf("Can't find key: %s", key)
 	}
