@@ -101,7 +101,7 @@ func (d *Decoder) NextPacket() (field *Field, err error) {
 
 func newField() *Field {
 	f := Field{}
-	f.Field = make(map[string]string, 20)
+	f.Field = make(map[string]string, 5)
 	return &f
 }
 
