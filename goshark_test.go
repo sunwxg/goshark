@@ -26,7 +26,7 @@ var data string = `<packet>
 func TestNextPacket(t *testing.T) {
 
 	file := "2.pcap"
-	d := CreateDecoder()
+	d := NewDecoder()
 	if err := d.DecodeStart(file); err != nil {
 		t.Fatalf("Decode start fail")
 	}
@@ -45,7 +45,7 @@ func TestNextPacket(t *testing.T) {
 }
 
 func TestIskey(t *testing.T) {
-	d := CreateDecoder()
+	d := NewDecoder()
 	r := bytes.NewReader([]byte(data))
 
 	f, err := d.LoadPacket(r)

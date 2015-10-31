@@ -30,7 +30,7 @@ type Decoder struct {
 	BufioReader *bufio.Reader
 }
 
-func CreateDecoder() (decoder *Decoder) {
+func NewDecoder() (decoder *Decoder) {
 	decoder = &Decoder{}
 	return decoder
 }
