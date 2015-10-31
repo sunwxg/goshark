@@ -18,9 +18,10 @@ import (
 var ErrNoPacket = errors.New("Don't find Packet in data")
 
 type Field struct {
-	Field  map[string]string
-	Childs []*Field
-	Parent *Field
+	Field   map[string]string
+	Childs  []*Field
+	Parent  *Field
+	Keylist map[string]*Field
 }
 
 type Decoder struct {
@@ -102,6 +103,7 @@ func (d *Decoder) NextPacket() (field *Field, err error) {
 func newField() *Field {
 	f := Field{}
 	f.Field = make(map[string]string, 5)
+	f.Keylist = make(map[string]*Field, 100)
 	return &f
 }
 
@@ -113,6 +115,7 @@ func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 	xd := xml.NewDecoder(r)
 	field = newField()
 	field.Parent = nil
+	rootField := field
 
 	currentField := field
 	var t *Field
@@ -133,6 +136,7 @@ func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 			key, value := getKeyValue(tt.Attr)
 			t = newField()
 			t.Field[key] = value
+			rootField.Keylist[key] = t
 
 			t.Parent = currentField
 			currentField.addChild(t)
@@ -189,34 +193,25 @@ func (field Field) String() string {
 	return strings.Join(buf, "")
 }
 
-func (field Field) iterateIskey(key string, f *Field, r *bool) {
-
-	if _, ok := field.Field[key]; ok {
-		*r = true
-		*f = field
-		return
-	}
-
-	for _, d := range field.Childs {
-		d.iterateIskey(key, f, r)
-	}
-}
-
 func (field Field) Iskey(key string) (value string, ok bool) {
-	f := newField()
 	ok = false
 
-	field.iterateIskey(key, f, &ok)
-	value, ok = f.getvalue(key)
-
+	if v, ok := field.Keylist[key]; ok {
+		ok = true
+		value = v.Field[key]
+		return value, ok
+	}
 	return value, ok
 }
 
 func (field Field) Getfield(key string) (f Field, ok bool) {
 	ok = false
 
-	field.iterateIskey(key, &f, &ok)
-
+	if v, ok := field.Keylist[key]; ok {
+		ok = true
+		f = *v
+		return f, ok
+	}
 	return f, ok
 }
 

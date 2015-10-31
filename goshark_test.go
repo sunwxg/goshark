@@ -65,3 +65,41 @@ func TestIskey(t *testing.T) {
 		t.Fatalf("expect: (%s) but get: (%s)", expected, get)
 	}
 }
+
+func TestGetField(t *testing.T) {
+	d := NewDecoder()
+	r := bytes.NewReader([]byte(data))
+
+	f, err := d.LoadPacket(r)
+	if err != nil {
+		t.Fatalf("load packet fail")
+	}
+
+	key := "f50"
+	expected := "50"
+	v, ok := f.Getfield(key)
+	if !ok {
+		t.Fatalf("Can't find key: %s", key)
+	}
+	get := v.Field[key]
+
+	if strings.Compare(get, expected) != 0 {
+		t.Fatalf("expect: (%s) but get: (%s)", expected, get)
+	}
+}
+
+func TestKeylist(t *testing.T) {
+	d := NewDecoder()
+	r := bytes.NewReader([]byte(data))
+
+	f, err := d.LoadPacket(r)
+	if err != nil {
+		t.Fatalf("load packet fail")
+	}
+
+	expected := 9
+	get := len(f.Keylist)
+	if expected != get {
+		t.Fatalf("expect: (%d) get: (%d)", expected, get)
+	}
+}
