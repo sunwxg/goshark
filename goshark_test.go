@@ -48,7 +48,7 @@ func TestIskey(t *testing.T) {
 	d := NewDecoder()
 	r := bytes.NewReader([]byte(data))
 
-	f, err := d.LoadPacket(r)
+	_, err := d.LoadPacket(r)
 	if err != nil {
 		t.Fatalf("load packet fail")
 	}
@@ -56,7 +56,7 @@ func TestIskey(t *testing.T) {
 	expected := "50"
 
 	key := "f50"
-	get, ok := f.Iskey(key)
+	get, ok := d.Iskey(key)
 	if !ok {
 		t.Fatalf("Can't find key: %s", key)
 	}
@@ -70,14 +70,14 @@ func TestGetField(t *testing.T) {
 	d := NewDecoder()
 	r := bytes.NewReader([]byte(data))
 
-	f, err := d.LoadPacket(r)
+	_, err := d.LoadPacket(r)
 	if err != nil {
 		t.Fatalf("load packet fail")
 	}
 
 	key := "f50"
 	expected := "50"
-	v, ok := f.Getfield(key)
+	v, ok := d.Getfield(key)
 	if !ok {
 		t.Fatalf("Can't find key: %s", key)
 	}
@@ -92,13 +92,13 @@ func TestKeylist(t *testing.T) {
 	d := NewDecoder()
 	r := bytes.NewReader([]byte(data))
 
-	f, err := d.LoadPacket(r)
+	_, err := d.LoadPacket(r)
 	if err != nil {
 		t.Fatalf("load packet fail")
 	}
 
 	expected := 9
-	get := len(f.Keylist)
+	get := len(d.Root.Keylist)
 	if expected != get {
 		t.Fatalf("expect: (%d) get: (%d)", expected, get)
 	}

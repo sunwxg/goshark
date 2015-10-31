@@ -18,6 +18,12 @@ import (
 var ErrNoPacket = errors.New("Don't find Packet in data")
 
 type Field struct {
+	Field  map[string]string
+	Childs []*Field
+	Parent *Field
+}
+
+type rootField struct {
 	Field   map[string]string
 	Childs  []*Field
 	Parent  *Field
@@ -29,6 +35,7 @@ type Decoder struct {
 	W           sync.WaitGroup
 	Reader      io.ReadCloser
 	BufioReader *bufio.Reader
+	Root        *rootField
 }
 
 func NewDecoder() (decoder *Decoder) {
@@ -103,6 +110,12 @@ func (d *Decoder) NextPacket() (field *Field, err error) {
 func newField() *Field {
 	f := Field{}
 	f.Field = make(map[string]string, 5)
+	return &f
+}
+
+func newRootField() *rootField {
+	f := rootField{}
+	f.Field = make(map[string]string, 5)
 	f.Keylist = make(map[string]*Field, 100)
 	return &f
 }
@@ -113,9 +126,12 @@ func (f *Field) addChild(c *Field) {
 
 func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 	xd := xml.NewDecoder(r)
+
 	field = newField()
 	field.Parent = nil
-	rootField := field
+
+	rootfield := newRootField()
+	d.Root = rootfield
 
 	currentField := field
 	var t *Field
@@ -136,7 +152,7 @@ func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 			key, value := getKeyValue(tt.Attr)
 			t = newField()
 			t.Field[key] = value
-			rootField.Keylist[key] = t
+			d.Root.Keylist[key] = t
 
 			t.Parent = currentField
 			currentField.addChild(t)
@@ -193,10 +209,10 @@ func (field Field) String() string {
 	return strings.Join(buf, "")
 }
 
-func (field Field) Iskey(key string) (value string, ok bool) {
+func (d *Decoder) Iskey(key string) (value string, ok bool) {
 	ok = false
 
-	if v, ok := field.Keylist[key]; ok {
+	if v, ok := d.Root.Keylist[key]; ok {
 		ok = true
 		value = v.Field[key]
 		return value, ok
@@ -204,10 +220,10 @@ func (field Field) Iskey(key string) (value string, ok bool) {
 	return value, ok
 }
 
-func (field Field) Getfield(key string) (f Field, ok bool) {
+func (d *Decoder) Getfield(key string) (f Field, ok bool) {
 	ok = false
 
-	if v, ok := field.Keylist[key]; ok {
+	if v, ok := d.Root.Keylist[key]; ok {
 		ok = true
 		f = *v
 		return f, ok
