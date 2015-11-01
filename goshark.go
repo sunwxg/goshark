@@ -184,8 +184,13 @@ func printMap(field Field, buf *[]string, i int) {
 		s = fmt.Sprintf("%s", strings.Repeat(". ", i))
 		*buf = append(*buf, s)
 
-		s = fmt.Sprintf("[%s] %s\n", key, value)
+		s = fmt.Sprintf("[%s] %s", key, value)
+
+		//remove space at the end of line
+		s = strings.TrimSpace(s)
+
 		*buf = append(*buf, s)
+		*buf = append(*buf, "\n")
 	}
 
 	for _, f := range field.Childs {
