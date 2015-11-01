@@ -15,7 +15,7 @@ import (
 
 //Data struct of IP packet
 type Field struct {
-	Field  map[string]string
+	Attrs  map[string]string
 	Childs []*Field
 	Parent *Field
 }
@@ -105,7 +105,7 @@ func (d *Decoder) NextPacket() (field *Field, err error) {
 
 func newField() *Field {
 	f := Field{}
-	f.Field = make(map[string]string, 5)
+	f.Attrs = make(map[string]string, 5)
 	return &f
 }
 
@@ -138,7 +138,7 @@ func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 		case xml.StartElement:
 			key, value := getKeyValue(tt.Attr)
 			t = newField()
-			t.Field[key] = value
+			t.Attrs[key] = value
 
 			t.Parent = currentField
 			currentField.addChild(t)
@@ -175,7 +175,7 @@ func getKeyValue(attr []xml.Attr) (key, keyvalue string) {
 func printMap(field Field, buf *[]string, i int) {
 	var s string
 
-	for key, value := range field.Field {
+	for key, value := range field.Attrs {
 		s = fmt.Sprintf("%s", strings.Repeat(". ", i))
 		*buf = append(*buf, s)
 
@@ -197,7 +197,7 @@ func (field Field) String() string {
 
 func (field Field) iterateIskey(key string, f *Field, r *bool) {
 
-	if _, ok := field.Field[key]; ok {
+	if _, ok := field.Attrs[key]; ok {
 		*r = true
 		*f = field
 		return
@@ -232,7 +232,7 @@ func (field Field) Getfield(key string) (f Field, ok bool) {
 
 func (field Field) getvalue(key string) (value string, ok bool) {
 
-	if value, ok := field.Field[key]; ok {
+	if value, ok := field.Attrs[key]; ok {
 		ok = true
 		return value, ok
 	}

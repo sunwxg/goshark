@@ -38,7 +38,7 @@ func TestNextPacket(t *testing.T) {
 	}
 
 	expected := 1
-	get := len(f.Childs[0].Childs[1].Field)
+	get := len(f.Childs[0].Childs[1].Attrs)
 	if get != expected {
 		t.Fatalf("expected (%d). get (%d)", expected, get)
 	}
