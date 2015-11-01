@@ -1,4 +1,4 @@
-//Package goshark use tshark to decode IP packet and create data struct to analysis packet.
+//Package goshark use tshark to decode IP packet and create data struct to analyse packet.
 package goshark
 
 import (
