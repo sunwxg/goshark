@@ -34,9 +34,14 @@ func NewDecoder() (decoder *Decoder) {
 
 //Start decoding. When finished, should use DecodeEnd
 //to close decoding. Use defer DecodeEnd after DecodeStart
-//success.
-//Return err ???
+//success. If can't find tshark tool, will return err.
 func (d *Decoder) DecodeStart(file string) (err error) {
+
+	_, err = exec.LookPath("tsharkxx")
+	if err != nil {
+		err = fmt.Errorf("Please install \"tshark\" tool")
+		return err
+	}
 
 	cmd := exec.Command("tshark", "-T", "pdml", "-r", file)
 

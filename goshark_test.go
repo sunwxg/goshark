@@ -28,7 +28,7 @@ func TestNextPacket(t *testing.T) {
 	file := "2.pcap"
 	d := NewDecoder()
 	if err := d.DecodeStart(file); err != nil {
-		t.Fatalf("Decode start fail")
+		t.Fatalf("Decode start fail: %s", err)
 	}
 	defer d.DecodeEnd()
 
