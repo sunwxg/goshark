@@ -1,6 +1,9 @@
 # goshark
 Package goshark use tshark to decode IP packet and create data struct to analysis packet.
 
+###Dependencies
+tshark tool
+
 ###Examples
 ```go
 file := "2.pcap"
