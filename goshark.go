@@ -37,7 +37,7 @@ func NewDecoder() (decoder *Decoder) {
 //success. If can't find tshark tool, will return err.
 func (d *Decoder) DecodeStart(file string) (err error) {
 
-	_, err = exec.LookPath("tsharkxx")
+	_, err = exec.LookPath("tshark")
 	if err != nil {
 		err = fmt.Errorf("Please install \"tshark\" tool")
 		return err
