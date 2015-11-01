@@ -1,5 +1,4 @@
-//goshark
-//
+//Package goshark use tshark to decode IP packet and get data struct to analysis packet.
 package goshark
 
 import (
@@ -15,8 +14,7 @@ import (
 	"sync"
 )
 
-var ErrNoPacket = errors.New("Don't find Packet in data")
-
+//Data struct of IP packet
 type Field struct {
 	Field  map[string]string
 	Childs []*Field
@@ -30,11 +28,16 @@ type Decoder struct {
 	BufioReader *bufio.Reader
 }
 
+//Implements Decoder
 func NewDecoder() (decoder *Decoder) {
 	decoder = &Decoder{}
 	return decoder
 }
 
+//Start decoding. When finished, should use DecodeEnd
+//to close decoding. Use defer DecodeEnd after DecodeStart
+//success.
+//Return err ???
 func (d *Decoder) DecodeStart(file string) (err error) {
 
 	cmd := exec.Command("tshark", "-T", "pdml", "-r", file)
@@ -55,6 +58,7 @@ func (d *Decoder) DecodeStart(file string) (err error) {
 	return
 }
 
+//Close decoding
 func (d *Decoder) DecodeEnd() error {
 	if err := d.Cmd.Wait(); err != nil {
 		log.Println("cmd wait fail:", err)
@@ -64,6 +68,8 @@ func (d *Decoder) DecodeEnd() error {
 	return nil
 }
 
+//Get the one packet from Decoder. When at then end of file,
+//get error io.EOF with nil field.
 func (d *Decoder) NextPacket() (field *Field, err error) {
 	var out []byte
 	var startRecord bool = false
@@ -109,6 +115,8 @@ func (f *Field) addChild(c *Field) {
 	f.Childs = append(f.Childs, c)
 }
 
+//Change xml data to Field struct. Xml data is gotten from tshark output.
+//When xml data isn't right, return xml decoding error
 func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 	xd := xml.NewDecoder(r)
 	field = newField()
@@ -146,9 +154,9 @@ func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 			}
 		}
 	}
-
 }
 
+//Get attribute "name" and "show" as map key and value
 func getKeyValue(attr []xml.Attr) (key, keyvalue string) {
 	for _, v := range attr {
 		name := v.Name.Local
@@ -202,6 +210,8 @@ func (field Field) iterateIskey(key string, f *Field, r *bool) {
 	}
 }
 
+//Get the value by key in a Field. When key doesn't exist,
+//return ok=false and value=nil
 func (field Field) Iskey(key string) (value string, ok bool) {
 	f := newField()
 	ok = false
@@ -212,6 +222,8 @@ func (field Field) Iskey(key string) (value string, ok bool) {
 	return value, ok
 }
 
+//Get the Field by key i a Field. When key doesn't exist,
+//return ok=false and f=nil
 func (field Field) Getfield(key string) (f Field, ok bool) {
 	ok = false
 
