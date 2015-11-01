@@ -11,7 +11,6 @@ import (
 	"log"
 	"os/exec"
 	"strings"
-	"sync"
 )
 
 //Data struct of IP packet
@@ -22,10 +21,9 @@ type Field struct {
 }
 
 type Decoder struct {
-	Cmd         *exec.Cmd
-	W           sync.WaitGroup
-	Reader      io.ReadCloser
-	BufioReader *bufio.Reader
+	cmd         *exec.Cmd
+	reader      io.ReadCloser
+	bufioReader *bufio.Reader
 }
 
 //Implements Decoder
@@ -42,13 +40,13 @@ func (d *Decoder) DecodeStart(file string) (err error) {
 
 	cmd := exec.Command("tshark", "-T", "pdml", "-r", file)
 
-	d.Cmd = cmd
-	d.Reader, err = cmd.StdoutPipe()
+	d.cmd = cmd
+	d.reader, err = cmd.StdoutPipe()
 	if err != nil {
 		return
 	}
 
-	d.BufioReader = bufio.NewReader(d.Reader)
+	d.bufioReader = bufio.NewReader(d.reader)
 
 	err = cmd.Start()
 	if err != nil {
@@ -60,7 +58,7 @@ func (d *Decoder) DecodeStart(file string) (err error) {
 
 //Close decoding
 func (d *Decoder) DecodeEnd() error {
-	if err := d.Cmd.Wait(); err != nil {
+	if err := d.cmd.Wait(); err != nil {
 		log.Println("cmd wait fail:", err)
 		return err
 	}
@@ -75,7 +73,7 @@ func (d *Decoder) NextPacket() (field *Field, err error) {
 	var startRecord bool = false
 
 	for {
-		line, _, err := d.BufioReader.ReadLine()
+		line, _, err := d.bufioReader.ReadLine()
 		if err == io.EOF {
 			return field, err
 		} else if err != nil {
