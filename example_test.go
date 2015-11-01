@@ -3,8 +3,9 @@ package goshark_test
 import (
 	"bytes"
 	"fmt"
-	"goshark"
 	"log"
+
+	"github.com/sunwxg/goshark"
 )
 
 func Example() {

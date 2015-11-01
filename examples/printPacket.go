@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"goshark"
 	"log"
+
+	"github.com/sunwxg/goshark"
 )
 
 func main() {
