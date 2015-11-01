@@ -1,4 +1,4 @@
-//Package goshark use tshark to decode IP packet and get data struct to analysis packet.
+//Package goshark use tshark to decode IP packet and create data struct to analysis packet.
 package goshark
 
 import (
@@ -66,7 +66,7 @@ func (d *Decoder) DecodeEnd() error {
 	return nil
 }
 
-//Get the one packet from Decoder. When at then end of file,
+//Get one packet from Decoder. At the end of file,
 //get error io.EOF with nil field.
 func (d *Decoder) NextPacket() (field *Field, err error) {
 	var out []byte
@@ -113,8 +113,8 @@ func (f *Field) addChild(c *Field) {
 	f.Childs = append(f.Childs, c)
 }
 
-//Change xml data to Field struct. Xml data is gotten from tshark output.
-//When xml data isn't right, return xml decoding error
+//Get Field struct from xml data. Xml data is gotten from tshark output.
+//If xml data isn't right, return xml decoding error
 func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 	xd := xml.NewDecoder(r)
 	field = newField()
@@ -188,6 +188,7 @@ func printMap(field Field, buf *[]string, i int) {
 	}
 }
 
+//Let printout human readable
 func (field Field) String() string {
 	buf := make([]string, 10, 20)
 	printMap(field, &buf, 0)
@@ -208,7 +209,7 @@ func (field Field) iterateIskey(key string, f *Field, r *bool) {
 	}
 }
 
-//Get the value by key in a Field. When key doesn't exist,
+//Get the value by key in a Field. If key doesn't exist,
 //return ok=false and value=nil
 func (field Field) Iskey(key string) (value string, ok bool) {
 	f := newField()
@@ -220,7 +221,7 @@ func (field Field) Iskey(key string) (value string, ok bool) {
 	return value, ok
 }
 
-//Get the Field by key i a Field. When key doesn't exist,
+//Get the Field by key i a Field. If key doesn't exist,
 //return ok=false and f=nil
 func (field Field) Getfield(key string) (f Field, ok bool) {
 	ok = false
