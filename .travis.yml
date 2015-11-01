@@ -1,0 +1,8 @@
+language: go
+go:
+- 1.5
+- tip
+before_install:
+- sudo apt-get install -qq vsftpd
+script:
+- go test -v
