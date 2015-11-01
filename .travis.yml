@@ -3,6 +3,6 @@ go:
 - 1.5
 - tip
 before_install:
-- sudo apt-get install -qq vsftpd
+        - sudo apt-get install -y tshark
 script:
 - go test -v
