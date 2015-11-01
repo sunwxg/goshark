@@ -4,5 +4,6 @@ go:
 - tip
 before_install:
         - sudo apt-get install -y tshark
+        - go get .
 script:
 - go test -v .
