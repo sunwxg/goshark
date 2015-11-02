@@ -231,7 +231,7 @@ func (field Field) Iskey(key string) (value string, ok bool) {
 	return value, ok
 }
 
-//Get the Field by key i a Field. If key doesn't exist,
+//Get the Field by key in a Field. If key doesn't exist,
 //return ok=false and f=nil
 func (field Field) Getfield(key string) (f Field, ok bool) {
 	ok = false
