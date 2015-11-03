@@ -1,6 +1,6 @@
 # goshark
 [![Build Status](https://travis-ci.org/sunwxg/goshark.png)](https://travis-ci.org/sunwxg/goshark) 
-[![Coverage Status](https://coveralls.io/repos/sunwxg/goshark/badge.svg?branch=master)](https://coveralls.io/r/sunwxg/goshark?branch=master) 
+[![Coverage Status](https://coveralls.io/repos/sunwxg/goshark/badge.svg?branch=master)](https://coveralls.io/sunwxg/goshark?branch=master) 
 [![GoDoc](http://godoc.org/github.com/sunwxg/goshark?status.svg)](http://godoc.org/github.com/sunwxg/goshark)
 
 Package goshark use tshark to decode IP packet and create data struct to analyse packet.
