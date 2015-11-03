@@ -1,4 +1,6 @@
-# goshark[![GoDoc](http://godoc.org/github.com/sunwxg/goshark?status.svg)](http://godoc.org/github.com/sunwxg/goshark)
+# goshark
+[![GoDoc](http://godoc.org/github.com/sunwxg/goshark?status.svg)](http://godoc.org/github.com/sunwxg/goshark)
+
 Package goshark use tshark to decode IP packet and create data struct to analyse packet.
 
 ###Dependencies
