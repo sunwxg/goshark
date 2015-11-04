@@ -161,6 +161,7 @@ func (d *Decoder) LoadPacket(r io.Reader) (field *Field, err error) {
 
 //Get attribute "name" and "show" as map key and value
 func getKeyValue(attr []xml.Attr) (key, keyvalue string) {
+	var showNameValue string
 	for _, v := range attr {
 		name := v.Name.Local
 		value := v.Value
@@ -172,7 +173,12 @@ func getKeyValue(attr []xml.Attr) (key, keyvalue string) {
 			key = value
 		case strings.Compare(name, "show") == 0:
 			keyvalue = value
+		case strings.Compare(name, "showname") == 0:
+			showNameValue = value
 		}
+	}
+	if keyvalue == "" {
+		return key, showNameValue
 	}
 	return key, keyvalue
 }
