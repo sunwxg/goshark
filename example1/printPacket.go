@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	file := "2.pcap"
+	file := "../2.pcap"
 	d := goshark.NewDecoder()
 	if err := d.DecodeStart(file); err != nil {
 		log.Println("Decode start fail:", err)
@@ -23,8 +23,5 @@ func main() {
 		return
 	}
 
-	s, ok := f.Getfield("igmp")
-	if ok {
-		fmt.Printf("%s", s)
-	}
+	fmt.Printf("%s", f)
 }
