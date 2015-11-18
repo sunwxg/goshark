@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/sunwxg/goshark"
@@ -17,11 +18,15 @@ func main() {
 	}
 	defer d.DecodeEnd()
 
-	f, err := d.NextPacket()
-	if err != nil {
-		log.Println("Get packet fail:", err)
-		return
-	}
+	for {
+		f, err := d.NextPacket()
+		if err == io.EOF {
+			return
+		} else if err != nil {
+			log.Println("Get packet fail:", err)
+			return
+		}
 
-	fmt.Printf("%s", f)
+		fmt.Printf("%s", f)
+	}
 }
