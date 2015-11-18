@@ -3,6 +3,7 @@ package goshark
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -63,5 +64,31 @@ func TestIskey(t *testing.T) {
 
 	if strings.Compare(get, expected) != 0 {
 		t.Fatalf("expect: (%s) but get: (%s)", expected, get)
+	}
+}
+
+func TestGetField(t *testing.T) {
+	d := NewDecoder()
+	r := bytes.NewReader([]byte(data))
+
+	f, err := d.LoadPacket(r)
+	if err != nil {
+		t.Fatalf("load packet fail")
+	}
+
+	key := "f41"
+	get, ok := f.Getfield(key)
+	if !ok {
+		t.Fatalf("Can't find key: %s", key)
+	}
+
+	buf := make([]byte, 100, 200)
+	w := bytes.NewBuffer(buf)
+
+	fmt.Fprintln(w, get)
+	len := w.Len()
+	expected := 121
+	if len != expected {
+		t.Fatalf("expect: (%d) but get: (%d)", expected, len)
 	}
 }
