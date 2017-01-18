@@ -62,6 +62,38 @@ func (d *Decoder) DecodeStart(file string) (err error) {
 	return
 }
 
+//DecodeStartWithArgs Start decoding and pass extra arguments to tshark.
+// When finished, should use DecodeEnd
+//to close decoding. Use defer DecodeEnd after DecodeStart
+//success. If can't find tshark tool, will return err.
+func (d *Decoder) DecodeStartWithArgs(file string, args ...string) (err error) {
+
+	_, err = exec.LookPath("tshark")
+	if err != nil {
+		err = fmt.Errorf("Please install \"tshark\" tool")
+		return err
+	}
+
+	cmdargs := append([]string{"-T", "pdml", "-r", file}, args...)
+	fmt.Println("Arguments are ", cmdargs)
+	cmd := exec.Command("tshark",cmdargs...)
+
+	d.cmd = cmd
+	d.reader, err = cmd.StdoutPipe()
+	if err != nil {
+		return
+	}
+
+	d.bufioReader = bufio.NewReader(d.reader)
+
+	err = cmd.Start()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 // DecodeAbort aborts the ongoing reading and kills tshark process
 func (d *Decoder) DecodeAbort() error {
 	if err := d.cmd.Process.Kill(); err != nil {
