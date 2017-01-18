@@ -62,6 +62,15 @@ func (d *Decoder) DecodeStart(file string) (err error) {
 	return
 }
 
+// DecodeAbort aborts the ongoing reading and kills tshark process
+func (d *Decoder) DecodeAbort() error {
+	if err := d.cmd.Process.Kill(); err != nil {
+		log.Println("cmd.Process kill fail:", err)
+		return err
+	}
+	return nil
+}
+
 //DecodeEnd Close decoding
 func (d *Decoder) DecodeEnd() error {
 	if err := d.cmd.Wait(); err != nil {
